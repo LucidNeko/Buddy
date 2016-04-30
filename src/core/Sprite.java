@@ -56,6 +56,8 @@ public abstract class Sprite implements IUpdateable, IRenderable {
 		}
 	}
 	
+	public void renderIDMask(PixelImage canvas, Camera camera) { }
+	
 	private static int NEXT_ID = 0xFF000000;
 	private static Map<Integer, Sprite> sprites = new HashMap<Integer, Sprite>();
 	

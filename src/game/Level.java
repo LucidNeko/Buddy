@@ -1,15 +1,18 @@
 package game;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
 import core.IRenderable;
 import core.IUpdateable;
+import ecs100.UI;
 import game.GameMap.Layer;
 import graphics.PixelImage;
 import math.AABB;
 import math.Transform;
 import math.Vec2;
+import util.Log;
 
 public class Level implements IUpdateable, IRenderable {
 
@@ -19,6 +22,8 @@ public class Level implements IUpdateable, IRenderable {
 	private GameMap map = new GameMap();
 	
 	private Camera camera;
+	
+	private Rope rope;
 	
 	public Level() {
 		reset();
@@ -34,6 +39,8 @@ public class Level implements IUpdateable, IRenderable {
 		player2.setLevel(this);
 		
 		camera = new Camera(new AABB(0, 0, map.getWidth(), map.getHeight()), player, player2);
+		
+		rope = new Rope(player, player2, 32);
 	}
 	
 	public GameMap getMap() {
@@ -46,24 +53,36 @@ public class Level implements IUpdateable, IRenderable {
 
 	@Override
 	public void update(float delta) {
+		rope.update(delta);		
 		player.update(delta);
 		player2.update(delta);
 		camera.update(delta);
+		
+		UI.drawString(Log.format("Pos: {}", player.transform().position.length()), 100, 300);
+		UI.drawString(Log.format("Pos: {}", player.transform().position.round().length()), 100, 350);
+		UI.drawString(Log.format("Pos: {}", player.getAABB()), 100, 400);
+		UI.drawString(Log.format("Pos: {}", player.transform().position), 100, 200);
+		UI.drawString(Log.format("Pos: {}", player2.transform().position), 100, 250);
+		
 	}
 
 	@Override
 	public void render(PixelImage canvas, Camera camera) {
-		camera = this.camera; 
-		
+		camera = this.camera;
+
 		Vec2 pos = camera.transform(new Vec2());
 		for(Layer layer : map.getBackgroundLayers()) {
 			canvas.blit(layer.getImage(), pos.x(), pos.y());
 		}
+
+		rope.render(canvas, camera);
+		
+		pos = camera.transform(new Vec2());
+		for(Layer layer : map.getWorldLayers()) {
+			canvas.blit(layer.getImage(), pos.x(), pos.y());
+		}
 		
 //		canvas.blit(map.getCollisionLayer().getImage(), 0, 0);
-		
-		Vec2 a = player.getAABB().getCenter();
-		Vec2 b = player.getAABB().getCenter();
 		
 		
 		player.render(canvas, camera);
@@ -79,6 +98,26 @@ public class Level implements IUpdateable, IRenderable {
 		for(Layer layer : map.getForegroundLayers()) {
 			canvas.blit(layer.getImage(), pos.x(), pos.y());
 		}
+		
+//		renderCollisionLayers(canvas, camera);
+	}
+	
+	private void renderCollisionLayers(PixelImage canvas, Camera camera) {
+		Vec2 tr = new Vec2();
+		tr = camera.transform(tr);
+		canvas.blit(map.getCollisionLayer().getImage(), tr.x(), tr.y(), 0xFFFF0000);
+		
+		tr = new Vec2();
+		tr = camera.transform(tr);
+		canvas.blit(map.getDynamicCollisionLayer().getImage(), tr.x(), tr.y(), 0xFFFF0000);
+		
+		AABB aabb = camera.transform(player.getAABB());
+		
+		if(canvas.testBounds((int)(aabb.left + aabb.getWidth()*0.5f), (int)(aabb.bottom))) 
+			canvas.setARGB((int)(aabb.left + aabb.getWidth()*0.5f), (int)(aabb.bottom), 0xFF00FF00);
+		
+		player.renderIDMask(canvas, camera);
+		player2.renderIDMask(canvas, camera);
 	}
 
 }

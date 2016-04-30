@@ -103,6 +103,25 @@ public class PixelImage implements Cloneable {
 		}
 	}
 	
+	public void blit(PixelImage img, int x, int y, int colorOverride) {
+		if(x + img.getWidth() < 0 || y + img.getHeight() < 0 || x >= width || y >= height) {
+			return;
+		}
+		
+		for(int srcY = 0; srcY < img.getHeight(); srcY++) {
+			for(int srcX = 0; srcX < img.getWidth(); srcX++) {
+				int dstX = x + srcX;
+				int dstY = y + srcY;
+				if(dstX >= 0 && dstX < this.getWidth() && dstY >= 0 && dstY < this.getHeight()) {
+					int alpha = img.getARGB(srcX, srcY) >> 24 & 0xFF;
+					if(alpha != 0) {
+						this.setARGB(dstX, dstY, colorOverride);
+					}
+				}
+			}
+		}
+	}
+	
 	public PixelImage getSubImage(int offsetX, int offsetY, int width, int height) {
 		PixelImage out = new PixelImage(width, height);
 		

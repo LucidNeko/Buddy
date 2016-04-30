@@ -6,6 +6,8 @@ import java.io.IOException;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.Control;
+import javax.sound.sampled.Control.Type;
 import javax.sound.sampled.LineEvent;
 import javax.sound.sampled.LineListener;
 import javax.sound.sampled.LineUnavailableException;
@@ -17,7 +19,7 @@ public class Audio {
 	
 	public static void play(byte[] data) {
 		Clip clip = loadClip(data);
-		clip.addLineListener(CLOSE_ON_STOP); 
+		clip.addLineListener(CLOSE_ON_STOP);
 		play(clip);
 	}
 	

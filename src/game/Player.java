@@ -2,6 +2,7 @@ package game;
 
 import java.awt.Color;
 
+import core.Audio;
 import core.Sprite;
 import ecs100.UI;
 import game.Collision.Result;
@@ -27,10 +28,10 @@ public class Player extends Sprite {
 
 	private Animator animator;
 
-	protected Vec2 velocity = new Vec2();
+	private Vec2 velocity = new Vec2();
 	private Vec2 forces = new Vec2(0, 1600f);
 	private float moveSpeed = 120f;
-	
+	private float maxFallSpeed = 300f;
 	private Level level;
 	
 	private boolean dead = false;
@@ -116,7 +117,7 @@ public class Player extends Sprite {
 	public void update(float delta) {
 		if(!dead && level.getMap().getCollisionLayer().isOutOfBounds(transform().position)) {
 			dead = true;
-			velocity.y = -forces.y * 0.3f;
+			velocity.y = -forces.y * 0.3f; // Fake jump
 			velocity.x = 0;
 		}
 		
@@ -126,15 +127,13 @@ public class Player extends Sprite {
 			if(controller.right()) move.x += 1;
 			velocity.x = move.x * moveSpeed;
 	
-//			Result result = new Result();
-//			if(level.getMap().getCollisionLayer().raycast(transform().position, new Vec2(0, 1), result)) {
-				if(isGrounded() || aerialManeuvers > 0) {
-					if(controller.upOnce()) {
-						velocity.y = -forces.y * 0.25f;
-						if(!isGrounded()) aerialManeuvers--;
-					}
+			if(isGrounded() || aerialManeuvers > 0) {
+				if(controller.upOnce()) {
+//					Audio.play(R.audio.jump_alt);
+					velocity.y = -forces.y * 0.25f;
+					if(!isGrounded()) aerialManeuvers--;
 				}
-//			}
+			}
 		}
 		
 		if(dead) {
@@ -144,13 +143,13 @@ public class Player extends Sprite {
 			}
 		}
 		
-		Vec2 forces = new Vec2(this.forces);
-		if(velocity.y > 0) 
-			forces.y *= 1f;
-		
-		velocity.y = Mathf.min(velocity.y, 300f);
-		
+//		if(Mathf.abs(transform().position.length() - transform().position.round().length()) < 0.2f) {
+//			transform().position = transform().position.round();
+//		}
+
 		Transform transform = transform();
+		velocity.y = Mathf.min(velocity.y, maxFallSpeed);
+		Vec2 forces = new Vec2(this.forces);
 		
 		Vec2 newPosition = transform.position.add(velocity.mul(delta)).add(forces.mul(0.5f).mul(delta*delta));
 		velocity = velocity.add(forces.mul(delta));
@@ -174,65 +173,19 @@ public class Player extends Sprite {
 			return to;
 		}
 		
-		if(from.equals(to, 1f)) {
+		if(from.equals(to, 0.6f)) {
 			return from;
 		}
 		
-		Collision collision = level.getMap().getCollisionLayer();
-		Collision dynamic = level.getMap().getDynamicCollisionLayer();
+		AABB aabb = getAABB();
+		Vec2 newPos = level.getMap().onMove(from, to, new Vec2(aabb.getWidth(), aabb.getHeight()));
 		
-		Result result = new Result();
-		if(collision.raycast(from, new Vec2(0, -1), result)) {
-			float hitY = result.end.y;
-			to.y = Mathf.max(to.y, hitY);
+		boolean ground = level.getMap().isGroundBelow(newPos);
+		if(!isGrounded() && ground) {
+			onGround();
+		} else if(isGrounded() && !ground) {
+			onLeaveGround();
 		}
-		
-		Vec2 delta = to.sub(from);
-		Vec2 newPos = new Vec2();
-		
-		float upOffset = 3;
-		
-//		if(delta.x > delta.y) {
-			//step x first
-			
-			int sign = Mathf.sign(delta.x);
-			result = new Result();
-			if(collision.raycast(from.sub(0, upOffset), new Vec2(sign, 0), result)) {
-				float hitX = result.end.x;
-//				Log.info("HITX: {}", hitX);
-				newPos.x = sign < 0 ? Mathf.max(from.x + delta.x, hitX) : Mathf.min(from.x + delta.x, hitX);
-			} else {
-				newPos.x = to.x;
-			}
-			
-			result = new Result();
-			if(collision.raycast(new Vec2(newPos.x, from.y - upOffset), new Vec2(0, 1), result)) {
-				float hitY = result.end.y;
-//				Log.info("HITY: {}", hitY);
-				newPos.y = Mathf.min(from.y, hitY);
-			} else {
-				newPos.y = to.y;
-			}
-			
-			//step y
-			
-			result = new Result();
-			if(collision.raycast(newPos, new Vec2(0, 1), result)) {
-				float hitY = result.end.y;
-//				Log.info("HITY: {}", hitY);
-				newPos.y = Mathf.min(newPos.y + delta.y, hitY);
-				
-				if(newPos.y == hitY) {
-					if(!isGrounded()) onGround();
-					velocity.y = 0;
-				} else {
-					if(isGrounded()) onLeaveGround();
-				}
-			} else {
-				newPos.y = to.y;
-				if(isGrounded()) onLeaveGround();
-			}
-	//	}
 		
 		return newPos;
 	}
@@ -256,8 +209,8 @@ public class Player extends Sprite {
 			SpriteSheet.Frame frame = animator.getAnimation().getFrame();
 			Vec2 pos = new Vec2(transform().position.x - frame.getWidth() / 2f, 
 	                			transform().position.y - frame.getHeight());
-//			pos = pos.ceil();
-			return new AABB(pos.x, pos.y, pos.x + frame.getWidth(), pos.y + frame.getHeight());
+			pos = pos.ceil();
+			return new AABB(pos.x, pos.y, pos.x + (int)frame.getWidth(), pos.y + (int)frame.getHeight());
 		} else {
 			return super.getAABB();
 		}
@@ -280,6 +233,17 @@ public class Player extends Sprite {
 			canvas.blit(frame.getImage(), pos.x(), pos.y());
 		}
 //		super.render(canvas, camera);
+	}
+	
+	@Override
+	public void renderIDMask(PixelImage canvas, Camera camera) {
+		if(animator != null) {
+			AABB aabb = getAABB();
+			aabb = camera.transform(aabb);
+			SpriteSheet.Frame frame = animator.getAnimation().getFrame();
+			Vec2 pos = new Vec2(aabb.left, aabb.top);
+			canvas.blit(frame.getImage(), pos.x(), pos.y(), this.getID());
+		}
 	}
 
 }

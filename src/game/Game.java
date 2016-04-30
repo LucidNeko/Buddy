@@ -28,7 +28,7 @@ public class Game extends GameLoop {
 	public Game() {
 		super(90, 120);
 		level = new Level();
-		canvas = new PixelImage(UI.getCanvasWidth()/4, UI.getCanvasHeight()/4);
+		canvas = new PixelImage(UI.getCanvasWidth()/scale, UI.getCanvasHeight()/scale);
 		scaledCanvas = new PixelImage(canvas.getWidth() * scale, canvas.getHeight() * scale);
 		
 		UI.setFont(R.fonts.kenpixel_mini_square);
@@ -66,7 +66,7 @@ public class Game extends GameLoop {
 			canvas.clear();
 			level.render(canvas, null);
 			synchronized(scaledCanvas) {
-				scaledCanvas = PixelImage.scale(canvas, scaledCanvas, 4);
+				scaledCanvas = PixelImage.scale(canvas, scaledCanvas, scale);
 			}
 		}
 		
@@ -74,13 +74,14 @@ public class Game extends GameLoop {
 		
 		//WHY??WHY??WHY??
 			
-		PixelImage.scale(canvas, scaledCanvas, 4);
-		
-		UI.clearGraphics();
-		UI.drawImage(scaledCanvas, 0, 0);
-//		UI.drawImage(canvas, 0, 0);
-//		UI.drawImage(canvas.asBufferedImage(), 0, 0, 800, 450);
-		UI.repaint();
+//		synchronized(canvas) {
+//			synchronized(scaledCanvas) {
+//				PixelImage.scale(canvas, scaledCanvas, 4);
+				UI.clearGraphics();
+				UI.drawImage(scaledCanvas, 0, 0);
+				UI.repaint();
+//			}
+//		}
 	}
 	
 	public static void main(String[] args) {

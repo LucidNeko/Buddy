@@ -49,6 +49,8 @@ class Ecs100Canvas extends JComponent { //
 	private Rectangle dirtyBounds = new Rectangle(0,0,-1,-1);
 
 	private Font font;
+	
+	private Object lock = new Object();
 
 	//Constructor
 	public Ecs100Canvas(){
@@ -62,6 +64,7 @@ class Ecs100Canvas extends JComponent { //
 
 
 	public void addNotify() {
+		synchronized(lock) {
 		super.addNotify();
 		font = this.getFont();
 		this.setBackground(Color.white);
@@ -72,11 +75,14 @@ class Ecs100Canvas extends JComponent { //
 		visibleGraphic = (Graphics2D) this.getGraphics();
 		clear();
 		setFocusable(true);
+		}
 	}
 
 	@Override
 	public void paint(Graphics g) {
+		synchronized(lock) {
 		g.drawImage(imgBuf, 0, 0, null);
+		}
 	}
 
 	public void update(Graphics g) {  // Stops component being cleared
@@ -93,18 +99,24 @@ class Ecs100Canvas extends JComponent { //
 
 	/** Set the current font size */
 	public void setFontSize(float size) {
+		synchronized(lock) {
 		this.font = font.deriveFont(size);
 		imgGraphic.setFont(this.font);
+		}
 	}
 
 	public void setFont(Font font) {
+		synchronized(lock) {
 		this.font = font;
 		imgGraphic.setFont(this.font);
+		}
 	}
 
 	/** Set the current line width */
 	public void setLineWidth(double width) {
+		synchronized(lock) {
 		imgGraphic.setStroke(new BasicStroke((float)width));
+		}
 	}
 
 	/**
@@ -123,6 +135,7 @@ class Ecs100Canvas extends JComponent { //
 	 */
 	public synchronized void redisplay() {
 		if (dirty){
+			synchronized(lock) {
 			Shape clip = visibleGraphic.getClip();
 			dirty = false;
 			Rectangle bounds = dirtyBounds; //new Rectangle(0,0,MaxX,MaxY);
@@ -132,12 +145,14 @@ class Ecs100Canvas extends JComponent { //
 				visibleGraphic.drawImage(imgBuf, 0, 0, null);
 			}
 			visibleGraphic.setClip(clip);
+			}
 			repaint(); 
 		}
 	}
 	/** Request the whole canvas to be redrawn, regardless of dirty.
 	 */
 	public synchronized void redisplayAll() {
+		synchronized(lock) {
 		Shape clip = visibleGraphic.getClip();
 		dirty = false;
 		dirtyBounds = new Rectangle(0,0,-1,-1);
@@ -147,6 +162,7 @@ class Ecs100Canvas extends JComponent { //
 			visibleGraphic.drawImage(imgBuf, 0, 0, null);
 		}
 		visibleGraphic.setClip(clip);
+		}
 		repaint(); 
 	}
 
@@ -158,11 +174,14 @@ class Ecs100Canvas extends JComponent { //
 	and then call the display() method on the Canvas to update the 
 	visible imagewith the modifications.*/
 	public Graphics2D getBackingGraphics() {
+		synchronized(lock) {
 		return imgGraphic;
+		}
 	}
 
 	/** Clear the canvas area. */
 	public void clear() {
+		synchronized(lock) {
 		synchronized(imgGraphic) {
 			Color save = imgGraphic.getColor();
 			imgGraphic.setColor(Color.white);
@@ -171,14 +190,17 @@ class Ecs100Canvas extends JComponent { //
 		}
 		dirty = true;
 		dirtyBounds = new Rectangle(0,0, MaxX, MaxY);
+		}
 	}
 
 	/** Set the current foreground color - the color for all subsequent shapes or 
 	 * text 
 	 */
 	public void setColor(Color c) {
+		synchronized(lock) {
 		synchronized(imgGraphic) {
 			imgGraphic.setColor(c);
+		}
 		}
 		//super.setForeground(c);
 	}
@@ -187,32 +209,39 @@ class Ecs100Canvas extends JComponent { //
 
 	/** Draw the outline of a shape */
 	public synchronized void draw(Shape shape) {
+		synchronized(lock) {
 		synchronized(imgGraphic) {
 			imgGraphic.draw(shape);
 		}
 		setDirty(shape);
+		}
 	}
 
 	/** Fill a shape */
 	public synchronized void fill(Shape shape) {
+		synchronized(lock) {
 		synchronized(imgGraphic) {
 			imgGraphic.fill(shape);
 		}
 		setDirty(shape);
+		}
 	}
 
 	public synchronized void invert(Shape shape) {
+		synchronized(lock) {
 		synchronized(imgGraphic) {
 			imgGraphic.setXORMode(Color.white);
 			imgGraphic.draw(shape);
 			imgGraphic.setPaintMode();
 		}
 		setDirty(shape);
+		}
 	}
 
 
 	/** Erase a shape, both the outline and the fill */
 	public synchronized void erase(Shape shape) {
+		synchronized(lock) {
 		synchronized(imgGraphic) {
 			Color save = imgGraphic.getColor();
 			imgGraphic.setColor(Color.white);
@@ -221,26 +250,34 @@ class Ecs100Canvas extends JComponent { //
 			imgGraphic.setColor(save);
 		}
 		setDirty(shape);
+		}
 	}
 
 	// Strings 
 
 	public Rectangle getStringBounds(String s, int x, int y) {
+		synchronized(lock) {
 		return getStringBounds(imgGraphic.getFontMetrics(), s, x, y);
+		}
 	}
 
 	private Rectangle getStringBounds(FontMetrics fm, String s, int x, int y) {
+		synchronized(lock) {
 		return new Rectangle(x, y -fm.getMaxAscent(), fm.stringWidth(s), fm.getMaxAscent()+fm.getMaxDescent());
+		}
 	}
 
 	public void drawString(String s, int x, int y) {
+		synchronized(lock) {
 		synchronized(imgGraphic) {
 			imgGraphic.drawString(s, x, y);
 		}
 		setDirty(getStringBounds(imgGraphic.getFontMetrics(), s, x, y));
+		}
 	}
 
 	public void invertString(String s, int x, int y) {
+		synchronized(lock) {
 		synchronized(imgGraphic) {
 			imgGraphic.setXORMode(Color.white);
 			imgGraphic.drawString(s, x, y);
@@ -250,9 +287,11 @@ class Ecs100Canvas extends JComponent { //
 		setDirty(x, y-fm.getMaxAscent(), 
 				fm.stringWidth(s)+fm.getMaxAdvance(),
 				fm.getMaxAscent()+fm.getMaxDescent());
+		}
 	}
 
 	public void eraseString(String s, int x, int y) {
+		synchronized(lock) {
 		synchronized(imgGraphic) {
 			Color save = imgGraphic.getColor();
 			imgGraphic.setColor(Color.white);
@@ -263,6 +302,7 @@ class Ecs100Canvas extends JComponent { //
 		setDirty(x, y-fm.getMaxAscent(), 
 				fm.stringWidth(s)+fm.getMaxAdvance(),
 				fm.getMaxAscent()+fm.getMaxDescent());
+		}
 	}
 
 	// Images
@@ -318,18 +358,22 @@ class Ecs100Canvas extends JComponent { //
 
 	/* from Image, scaled*/
 	public void drawImage(Image img, int x, int y, int width, int height) {
+		synchronized(lock) {
 		synchronized(imgGraphic) {
 			imgGraphic.drawImage(img, x, y, width, height, this);
 		}
 		setDirty(x, y, width, height);
+		}
 	}
 
 	/* from Image, unscaled*/
 	public void drawImage(Image img, int x, int y) {
+		synchronized(lock) {
 		synchronized(imgGraphic) {
 			imgGraphic.drawImage(img, x, y, this);
 		}
 		setDirty(x, y, img.getWidth(this), img.getHeight(this));
+		}
 	}
 
 	public void eraseImage(String name, int x, int y) {
@@ -353,6 +397,7 @@ class Ecs100Canvas extends JComponent { //
 	}
 
 	public void eraseImage(Image img, int x, int y) {
+		synchronized(lock) {
 		int width = img.getWidth(this);
 		int height = img.getHeight(this);
 		synchronized(imgGraphic) {
@@ -362,5 +407,6 @@ class Ecs100Canvas extends JComponent { //
 			imgGraphic.setColor(save);
 		}
 		setDirty(x, y, width, height);
+		}
 	}
 }

@@ -65,4 +65,9 @@ public class AABB {
 		return new AABB(this);
 	}
 
+	@Override
+	public String toString() {
+		return "AABB [left=" + left + ", top=" + top + ", right=" + right + ", bottom=" + bottom + "]";
+	}
+	
 }

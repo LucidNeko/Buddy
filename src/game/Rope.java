@@ -3,144 +3,66 @@ package game;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.util.ArrayList;
-import java.util.List;
 
 import core.IRenderable;
 import core.IUpdateable;
+import core.Sprite;
+import ecs100.UI;
 import graphics.PixelImage;
-import math.Transform;
+import math.Mathf;
 import math.Vec2;
 import util.Log;
 
 public class Rope implements IUpdateable, IRenderable {
 	
-	private int PARTICLES = 10;
-	private Vec2 GRAVITY = new Vec2(0, 1600f);
+	private Player a;
+	private Player b;
+	private float distance;
+	private float factor = 100f;
 	
-	private Transform a;
-	private Transform b;
-	private float length;
+	Vec2 print1 = new Vec2();
+	Vec2 print2 = new Vec2();
 	
-	private Particle[] particles = new Particle[PARTICLES];
-	private List<Constraint> constraints = new ArrayList<Constraint>();
-	
-	public Rope(Transform a, Transform b) {
-		this(a, b, a.position.sub(b.position).length());
-	}
-		
-	public Rope(Transform a, Transform b, float length) {
+	public Rope(Player a, Player b, float distance) {
 		this.a = a;
 		this.b = b;
-		this.length = length;
-
-		
-		
-		for(int i = 0; i < PARTICLES; i++) {
-			particles[i] = new Particle(a.position.lerp(b.position, i / PARTICLES));
-			if(i > 0) {
-				Particle p1 = particles[i-1];
-				Particle p2 = particles[i];
-				constraints.add(new DistanceConstraint(p1, p2, length/PARTICLES));
-			}
-		}
-		
-
-		constraints.add(0, new PinConstraint(particles[0], a));
-		constraints.add(0, new PinConstraint(particles[PARTICLES-1], b));
+		this.distance = distance;
 	}
 
 	@Override
 	public void update(float delta) {
-		for(Particle p : particles) {
-			p.update(delta);
-		}
-		
-		for(int i = 0; i < 10; i++) {
-			for(Constraint c : constraints) {
-				c.solve(delta);
-			}
-		}
+		Vec2 direction = b.transform().position.sub(a.transform().position);
+		float length = direction.normalize();
+		if(length < Mathf.EPSILON) { return; }
+		float sign = (length - distance)/length;
+		if(sign < 0) { return; }
+		Vec2 correction = direction.mul(sign * (length-distance) * 0.5f);
+//		a.accumulateForce(correction.mul(factor));
+//		b.accumulateForce(correction.mul(-factor));
+//		a.transform().position.set(a.transform().position.add(correction));
+//		b.transform().position.set(b.transform().position.sub(correction));
 	}
-
+	
 	@Override
 	public void render(PixelImage canvas, Camera camera) {
-		Graphics2D g = canvas.asBufferedImage().createGraphics();
-		g.setColor(Color.GREEN);
-		g.setStroke(new BasicStroke(3));
+		Vec2 p1 = camera.transform(a.getAABB().getCenter());
+		Vec2 p2 = camera.transform(b.getAABB().getCenter());
 		
-		for(int i = 1; i < particles.length; i++) {
-			Particle p1 = particles[i-1];
-			Particle p2 = particles[i];
-			Vec2 a = camera.transform(p1.position);
-			Vec2 b = camera.transform(p2.position);
-			g.drawLine(a.x(), a.y(), b.x(), b.y());
+		Graphics2D g = canvas.createGraphics();
+		if(p1.sub(p2).length() < 150) {
+			g.setColor(new Color(240, 189, 86));
+		} else {
+			g.setColor(Color.ORANGE);
 		}
-		
+		g.setStroke(new BasicStroke(1));
+		g.drawLine(p1.x(), p1.y(), p2.x(), p2.y());
 		g.dispose();
 	}
+
 	
-	private class Particle implements IUpdateable {
-		
-		Vec2 position;
-		Vec2 oldPosition;
-		
-		public Particle(Vec2 position) {
-			this.position = new Vec2(position);
-			this.oldPosition = new Vec2(position);
-		}
-
-		@Override
-		public void update(float delta) {
-			Vec2 velocity = position.sub(oldPosition).mul(delta);
-			oldPosition.set(position);
-			position = position.add(velocity).add(GRAVITY.mul(0.5f).mul(delta*delta));
-		}
-		
-	}
 	
-	private interface Constraint {
-		public void solve(float delta);
-	}
-
-	private class DistanceConstraint implements Constraint {
-		
-		Particle a;
-		Particle b;
-		float length;
-		
-		public DistanceConstraint(Particle a, Particle b, float length) {
-			this.a = a;
-			this.b = b;
-			this.length = length;
-		}
-
-		@Override
-		public void solve(float delta) {
-			Vec2 direction = b.position.sub(a.position);
-			float distance = direction.normalize();
-			if(distance == 0) { return; }
-			Vec2 correction = direction.mul((distance - length)/distance);
-			a.position.set(a.position.add(correction));
-			b.position.set(b.position.sub(correction));
-		}
-		
-	}
 	
-	private class PinConstraint implements Constraint {
-		
-		private Particle particle;
-		private Transform transform;
-
-		public PinConstraint(Particle particle, Transform transform) {
-			this.particle = particle;
-			this.transform = transform;
-		}
-
-		@Override
-		public void solve(float delta) {
-			particle.position.set(transform.position);
-		}
-		
-	}
+	
+	
+	
 }

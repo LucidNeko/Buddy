@@ -169,7 +169,7 @@ public class Vec2 {
 
 	@Override
 	public String toString() {
-		return String.format("Vec2 [x=%.2f, y=%.2f]", x, y);
+		return String.format("Vec2 [x=%.5f, y=%.5f]", x, y);
 	}
 
 }

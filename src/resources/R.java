@@ -7,8 +7,17 @@ import util.IO;
 
 public class R{
 	public static class audio{
-		public static final byte[] bu_a_hunting_road = IO.loadAudio("R/audio/bu-a-hunting-road.wav");
+		public static final byte[] chirp = IO.loadAudio("R/audio/chirp.wav");
+		public static final byte[] coin = IO.loadAudio("R/audio/coin.wav");
+		public static final byte[] enemydie = IO.loadAudio("R/audio/enemydie.wav");
+		public static final byte[] explosion = IO.loadAudio("R/audio/explosion.wav");
+		public static final byte[] hurt = IO.loadAudio("R/audio/hurt.wav");
 		public static final byte[] jump = IO.loadAudio("R/audio/jump.wav");
+		public static final byte[] jump_alt = IO.loadAudio("R/audio/jump_alt.wav");
+		public static final byte[] pulse = IO.loadAudio("R/audio/pulse.wav");
+		public static final byte[] sproing = IO.loadAudio("R/audio/sproing.wav");
+		public static final byte[] woo = IO.loadAudio("R/audio/woo.wav");
+		public static final byte[] zap = IO.loadAudio("R/audio/zap.wav");
 	}
 
 	public static class fonts{
@@ -16,24 +25,28 @@ public class R{
 	}
 
 	public static class images{
-		public static class hero{
-			public static final SpriteSheet mami_idle = IO.loadSpriteSheet("R/images/hero/mami_idle.450.7.sprite");
-			public static final SpriteSheet mami_run_left = IO.loadSpriteSheet("R/images/hero/mami_run_left.450.8.sprite");
-			public static final SpriteSheet mami_run_right = IO.loadSpriteSheet("R/images/hero/mami_run_right.450.8.sprite");
+		public static class test{
+			public static class hero{
+				public static final SpriteSheet mami_idle = IO.loadSpriteSheet("R/images/test/hero/mami_idle.450.7.sprite");
+				public static final SpriteSheet mami_run_left = IO.loadSpriteSheet("R/images/test/hero/mami_run_left.450.8.sprite");
+				public static final SpriteSheet mami_run_right = IO.loadSpriteSheet("R/images/test/hero/mami_run_right.450.8.sprite");
+			}
+
+			public static class terrain{
+				public static final PixelImage test_ground = IO.loadImage("R/images/test/terrain/test_ground.png");
+			}
+
+			public static final PixelImage Pumpkin_C = IO.loadImage("R/images/test/Pumpkin_C.png");
+			public static final PixelImage Pumpkin_N = IO.loadImage("R/images/test/Pumpkin_N.png");
+			public static final SpriteSheet idlebig = IO.loadSpriteSheet("R/images/test/idlebig.100.6.sprite");
+			public static final SpriteSheet idlesmall = IO.loadSpriteSheet("R/images/test/idlesmall.100.6.sprite");
+			public static final PixelImage test = IO.loadImage("R/images/test/test.png");
+			public static final PixelImage test_diff = IO.loadImage("R/images/test/test_diff.png");
+			public static final PixelImage test_diff2 = IO.loadImage("R/images/test/test_diff2.png");
+			public static final PixelImage test_diff3 = IO.loadImage("R/images/test/test_diff3.png");
 		}
 
-		public static class terrain{
-			public static final PixelImage test_ground = IO.loadImage("R/images/terrain/test_ground.png");
-		}
-
-		public static final PixelImage Pumpkin_C = IO.loadImage("R/images/Pumpkin_C.png");
-		public static final PixelImage Pumpkin_N = IO.loadImage("R/images/Pumpkin_N.png");
-		public static final SpriteSheet idlebig = IO.loadSpriteSheet("R/images/idlebig.100.6.sprite");
-		public static final SpriteSheet idlesmall = IO.loadSpriteSheet("R/images/idlesmall.100.6.sprite");
-		public static final PixelImage test = IO.loadImage("R/images/test.png");
-		public static final PixelImage test_diff = IO.loadImage("R/images/test_diff.png");
-		public static final PixelImage test_diff2 = IO.loadImage("R/images/test_diff2.png");
-		public static final PixelImage test_diff3 = IO.loadImage("R/images/test_diff3.png");
+		public static final PixelImage key = IO.loadImage("R/images/key.png");
 	}
 
 	public static class levels{
@@ -71,6 +84,9 @@ public class R{
 				public static final SpriteSheet idle = IO.loadSpriteSheet("R/sprites/enemies/walky/idle.250.2.sprite");
 				public static final SpriteSheet walk = IO.loadSpriteSheet("R/sprites/enemies/walky/walk.250.2.sprite");
 			}
+		}
+
+		public static class key{
 		}
 
 		public static class player{
