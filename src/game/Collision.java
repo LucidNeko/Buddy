@@ -7,6 +7,7 @@ import core.Sprite;
 import graphics.PixelImage;
 import math.AABB;
 import math.Vec2;
+import util.Log;
 
 public class Collision {
 	
@@ -18,6 +19,36 @@ public class Collision {
 	
 	public Collision(PixelImage image) {
 		this.image = image;
+		
+//		for(int y = 0; y < image.getHeight(); y++) {
+//			for(int x = 0; x < image.getWidth(); x++) {//				
+//				int left = -1;
+//				int right = -1;
+//				int up = -1;
+//				int upp = -1;
+//				int down = -1;
+//				
+//				if(image.testBounds(x-1, y)) left = image.getAlpha(x-1, y);
+//				if(image.testBounds(x+1, y)) right = image.getAlpha(x+1, y);
+//				if(image.testBounds(x, y-1)) up = image.getAlpha(x, y-1);
+//				if(image.testBounds(x, y+1)) down = image.getAlpha(x, y+1);
+//				
+//				int count = 0;
+//				if(left != 0) count++;
+//				if(right != 0) count++;
+//				if(up != 0) count++;
+//				if(down != 0) count++;
+//				
+//				if(count >= 3) {
+//					image.setARGB(x, y, 0xFF000000);
+//				}
+//			}
+//		}
+		
+	}
+	
+	public void add(PixelImage image) {
+		this.image.blit(image, 0, 0, 0xFF000000);
 	}
 	
 	public boolean raycast(Vec2 start, Vec2 dir, Result out) {
@@ -124,7 +155,7 @@ public class Collision {
 	}
 	
 	public void clear() {
-		image.clear();
+		image.fill(0);
 	}
 	
 	public void add(Sprite sprite) {
@@ -138,6 +169,8 @@ public class Collision {
 		g.fillRect((int)(box.left), (int)(box.top), (int)(box.right - box.left), (int)(box.bottom - box.top));
 		g.dispose();
 	}
+	
+	
 	
 	public static class Result {
 		public Vec2 start;

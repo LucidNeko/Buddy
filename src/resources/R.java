@@ -7,6 +7,7 @@ import util.IO;
 
 public class R{
 	public static class audio{
+		public static final byte[] a_bannanas_ages = IO.loadAudio("R/audio/a_bannanas_ages.wav");
 		public static final byte[] chirp = IO.loadAudio("R/audio/chirp.wav");
 		public static final byte[] coin = IO.loadAudio("R/audio/coin.wav");
 		public static final byte[] enemydie = IO.loadAudio("R/audio/enemydie.wav");
@@ -69,6 +70,13 @@ public class R{
 		}
 
 		public static class level001{
+			public static final PixelImage Level02_bg = IO.loadImage("R/levels/level001/Level02_bg.png");
+			public static final PixelImage Level02_decorations = IO.loadImage("R/levels/level001/Level02_decorations.png");
+			public static final PixelImage Level02_hazards = IO.loadImage("R/levels/level001/Level02_hazards.png");
+			public static final PixelImage Level02_notes = IO.loadImage("R/levels/level001/Level02_notes.png");
+			public static final PixelImage Level02_oneside = IO.loadImage("R/levels/level001/Level02_oneside.png");
+			public static final PixelImage Level02_preview = IO.loadImage("R/levels/level001/Level02_preview.png");
+			public static final PixelImage Level02_world = IO.loadImage("R/levels/level001/Level02_world.png");
 		}
 
 		public static class test{

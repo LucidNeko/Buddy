@@ -52,7 +52,7 @@ public class Camera implements IUpdateable {
 		}
 		sum = sum.div(targets.length);
 		
-		transform.position = transform.position.sslerp(sum, 0.20f-delta);
+		transform.position = transform.position.sslerp(sum, Mathf.clamp(0.20f-delta, 0, 1));
 		transform.position.x = Mathf.clamp(transform.position.x, bounds.left + width * 0.5f, bounds.right - width * 0.5f);
 		transform.position.y = Mathf.clamp(transform.position.y, bounds.top + height * 0.5f, bounds.bottom - height * 0.5f);
 	}

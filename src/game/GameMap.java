@@ -11,29 +11,31 @@ import math.Mathf;
 import math.Vec2;
 import resources.R;
 
-public class GameMap {
+public abstract class GameMap {
 
-	private List<Layer> background = new ArrayList<Layer>();
-	private List<Layer> world = new ArrayList<Layer>();
-	private List<Layer> foreground = new ArrayList<Layer>();
+	protected List<Layer> background = new ArrayList<Layer>();
+	protected List<Layer> world = new ArrayList<Layer>();
+	protected List<Layer> hazards = new ArrayList<Layer>();
+	protected List<Layer> foreground = new ArrayList<Layer>();
 	
-	private Collision collision;
-	private Collision dynamicCollision;
+	protected Collision collision;
+	protected Collision dynamicCollision;
 	
-	public GameMap() {
-		background.add(new Layer(R.levels.level000.background7));
-		world.add(new Layer(R.levels.level000.Level01_world));
-		world.add(new Layer(R.levels.level000.Level01_hazards));
-		world.add(new Layer(R.levels.level000.Level01_oneside));
-		foreground.add(new Layer(R.levels.level000.Level01_decorations));
-		collision = new Collision(R.levels.level000.Level01_world);
-		dynamicCollision = new Collision(collision.getWidth(), collision.getHeight());
+	public GameMap() { 
+		init();
 	}
 	
+	public abstract void init();
+	
 	public Vec2 onMove(Vec2 from, Vec2 to, Vec2 halfSize) {
-		Collision collision = this.collision;
-		Collision dynamic = this.dynamicCollision;
+		Vec2 pos = onMove(from, to, halfSize, collision);
 		
+		
+		
+		return pos;
+	}
+	
+	private Vec2 onMove(Vec2 from, Vec2 to, Vec2 halfSize, Collision collision) {		
 		Result result = new Result();
 		if(collision.raycast(from, new Vec2(0, -1), result)) {
 			float hitY = result.end.y;
@@ -44,6 +46,20 @@ public class GameMap {
 		Vec2 newPos = new Vec2();
 		
 		float upOffset = 3;
+		
+		boolean goingUp = false;
+		
+		if(!isGapAbove(from, 6)) {
+			result = new Result();
+			if(collision.raycast(from, new Vec2(0, -1), result)) {
+				float diff = from.y - result.end.y;
+				upOffset = Mathf.min(upOffset, diff);
+			}
+		} else {
+			goingUp = true;
+		}
+		
+		
 		
 		//step x first
 		
@@ -74,19 +90,74 @@ public class GameMap {
 			newPos.y = to.y;
 		}
 		
+		if(!goingUp && collision.collide(newPos)) {
+			return from;
+		}
+		
 		return newPos;
 	}
 	
-	public boolean isGroundBelow(Vec2 pos) {
-		int x = pos.x();
-		int y = pos.y() + 1;
-		if(collision.getImage().testBounds(x, y)) {
-			if(collision.getImage().getAlpha(x, y) != 0) {
-				return true;
+	public boolean isGroundBelow(Vec2 pos, int pixels) {
+		boolean result = false;
+		for(int y = 1; y <= pixels; y++) {
+			if(collision.getImage().testBounds(pos.x(), pos.y() + y)) {
+				if(collision.getImage().getAlpha(pos.x(), pos.y() + y) != 0) {
+					result |= true;
+				}
 			}
+		}
+		return result;
+	}
+	
+	public boolean isGroundBeside(Vec2 pos) {
+		int x = pos.x();
+		int y = pos.y();
+		if((collision.getImage().testBounds(x-1, y) && collision.getImage().getAlpha(x-1, y) != 0) ||
+		   (collision.getImage().testBounds(x+1, y) && collision.getImage().getAlpha(x+1, y) != 0))
+		{
+			return true;
 		}
 		return false;
 		
+	}
+	
+	public boolean isGapAbove(Vec2 pos, int pixels) {
+		for(int y = 3; y <= pixels; y++) {
+			if(collision.getImage().testBounds(pos.x(), pos.y() - y)) {
+				if(collision.getImage().getAlpha(pos.x(), pos.y() - y) == 0) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	public boolean isOnHazard(Vec2 pos, int pixels) {
+		boolean result = false;
+		for(int y = 1; y <= pixels; y++) {
+			for(Layer hazard : hazards) {
+				if(hazard.getImage().testBounds(pos.x(), pos.y() + y)) {
+					if(hazard.getImage().getAlpha(pos.x(), pos.y() + y) != 0) {
+						result |= true;
+					}
+				}
+			}
+		}
+		return result;
+	}
+	
+	public boolean canFallThrough(Vec2 pos, int pixels, Vec2 outUnderPos) {
+		boolean result = false;
+		for(int y = 1; y <= pixels; y++) {
+			Vec2 test = pos.add(0, y);
+			if(collision.getImage().testBounds(test.x(), test.y())) {
+				if(collision.getImage().getAlpha(test.x(), test.y()) == 0) {
+					outUnderPos.set(test);
+					result |= true;
+				}
+			}
+		}
+		return result;
 	}
 	
 	public int getWidth() {
@@ -111,6 +182,10 @@ public class GameMap {
 	
 	public List<Layer> getWorldLayers() {
 		return world;
+	}
+	
+	public List<Layer> getHazardLayers() {
+		return hazards;
 	}
 	
 	public List<Layer> getForegroundLayers() {

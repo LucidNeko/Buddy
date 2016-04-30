@@ -4,6 +4,9 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
+import javax.sound.sampled.Clip;
+
+import core.Audio;
 import core.IRenderable;
 import core.IUpdateable;
 import ecs100.UI;
@@ -12,6 +15,7 @@ import graphics.PixelImage;
 import math.AABB;
 import math.Transform;
 import math.Vec2;
+import resources.R;
 import util.Log;
 
 public class Level implements IUpdateable, IRenderable {
@@ -19,28 +23,47 @@ public class Level implements IUpdateable, IRenderable {
 	private Player player;
 	private Player player2;
 	
-	private GameMap map = new GameMap();
+	private GameMap map = GameMaps.maps[1];
 	
 	private Camera camera;
 	
 	private Rope rope;
+	
+	private boolean reset = false;
+	
+	private Clip clip = Audio.loop(R.audio.a_bannanas_ages);;
 	
 	public Level() {
 		reset();
 	}
 	
 	public void reset() {
+		reset = true;
+	}
+	
+	private void reset(GameMap map) {
 		player = new Player(Controller.P1);
-		player.transform().position.set(100, 100);
+		player.transform().position.set(3*16, 30*16);
 		player.setLevel(this);
 		
 		player2 = new Player(Controller.P2);
-		player2.transform().position.set(150, 100);
+		player2.transform().position.set(6*16, 30*16);
 		player2.setLevel(this);
 		
-		camera = new Camera(new AABB(0, 0, map.getWidth(), map.getHeight()), player, player2);
+		player2.transform().setParent(player.transform());
+		
+		if(camera == null)
+			camera = new Camera(new AABB(0, 0, map.getWidth(), map.getHeight()), player, player2);
+		else
+			camera.setTargets(player, player2);
 		
 		rope = new Rope(player, player2, 32);
+		
+//		if(clip != null && clip.isOpen()) {
+//			clip.close();
+//		}
+//
+//		clip = Audio.loop(R.audio.a_bannanas_ages);
 	}
 	
 	public GameMap getMap() {
@@ -53,6 +76,16 @@ public class Level implements IUpdateable, IRenderable {
 
 	@Override
 	public void update(float delta) {
+		if(reset) {
+			reset = false;
+			reset(map);
+		}
+		
+		map.getDynamicCollisionLayer().clear();
+		
+		map.getDynamicCollisionLayer().add(player);
+		map.getDynamicCollisionLayer().add(player2);
+		
 		rope.update(delta);		
 		player.update(delta);
 		player2.update(delta);
@@ -82,6 +115,11 @@ public class Level implements IUpdateable, IRenderable {
 			canvas.blit(layer.getImage(), pos.x(), pos.y());
 		}
 		
+		pos = camera.transform(new Vec2());
+		for(Layer layer : map.getHazardLayers()) {
+			canvas.blit(layer.getImage(), pos.x(), pos.y());
+		}
+		
 //		canvas.blit(map.getCollisionLayer().getImage(), 0, 0);
 		
 		
@@ -100,6 +138,10 @@ public class Level implements IUpdateable, IRenderable {
 		}
 		
 //		renderCollisionLayers(canvas, camera);
+		canvas.clear();
+		Vec2 tr = new Vec2();
+		tr = camera.transform(tr);
+		canvas.blit(map.getDynamicCollisionLayer().getImage(), tr.x(), tr.y(), 0xFFFF0000);
 	}
 	
 	private void renderCollisionLayers(PixelImage canvas, Camera camera) {

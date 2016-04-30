@@ -1,12 +1,13 @@
 package math;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
 public class Transform {
 
 	private Transform parent = null;
-	private Set<Transform> childern = new TreeSet<Transform>();
+	private Set<Transform> childern = new HashSet<Transform>();
 	
 	public Vec2 position = new Vec2();
 	

@@ -42,6 +42,27 @@ public class Player extends Sprite {
 
 	private boolean isGrounded = false;
 	
+
+	private boolean isDownDoubleTap = false;
+	private TapTimer downDoubleTapTimer = new TapTimer() {
+
+		@Override
+		public boolean onDoubleTap() {
+			return isDownDoubleTap = true;
+		}
+
+		@Override
+		public boolean isTap() {
+			return controller.downOnce();
+		}
+
+		@Override
+		public boolean onDoubleTapOff() {
+			return isDownDoubleTap = false;
+		}
+		
+	};
+	
 	public Player(Controller controller) {
 		super();
 		this.controller = controller;
@@ -115,10 +136,11 @@ public class Player extends Sprite {
 	
 	@Override
 	public void update(float delta) {
-		if(!dead && level.getMap().getCollisionLayer().isOutOfBounds(transform().position)) {
+		if(!dead && (level.getMap().getCollisionLayer().isOutOfBounds(transform().position) || level.getMap().isOnHazard(transform().position, 3))) {
 			dead = true;
 			velocity.y = -forces.y * 0.3f; // Fake jump
 			velocity.x = 0;
+			Audio.play(R.audio.hurt);
 		}
 		
 		if(!dead) {
@@ -129,7 +151,7 @@ public class Player extends Sprite {
 	
 			if(isGrounded() || aerialManeuvers > 0) {
 				if(controller.upOnce()) {
-//					Audio.play(R.audio.jump_alt);
+					Audio.play(R.audio.jump_alt);
 					velocity.y = -forces.y * 0.25f;
 					if(!isGrounded()) aerialManeuvers--;
 				}
@@ -139,11 +161,21 @@ public class Player extends Sprite {
 		if(dead) {
 			respawnCounter -= delta;
 			if(respawnCounter <= 0) {
-				level.reset();
+				level.reset();//GameMaps.getRandomMap());
 			}
 		}
 		
-//		if(Mathf.abs(transform().position.length() - transform().position.round().length()) < 0.2f) {
+		downDoubleTapTimer.update(delta);
+		
+		Vec2 outUnder = new Vec2();
+		if(!dead && level.getMap().isGroundBelow(transform().position, 1) && level.getMap().canFallThrough(transform().position, 8, outUnder)) {
+			if(this.isDownDoubleTap) {
+				transform().position.set(outUnder);
+				this.downDoubleTapTimer.reset();
+			}
+		}
+		
+//		if(Mathf.abs(transform().position.length() - transform().position.round().length()) < 0.4f) {
 //			transform().position = transform().position.round();
 //		}
 
@@ -153,6 +185,8 @@ public class Player extends Sprite {
 		
 		Vec2 newPosition = transform.position.add(velocity.mul(delta)).add(forces.mul(0.5f).mul(delta*delta));
 		velocity = velocity.add(forces.mul(delta));
+		
+		
 		
 		newPosition = onMove(transform.position, newPosition);
 		
@@ -166,6 +200,8 @@ public class Player extends Sprite {
 		UI.setColor(Color.GREEN);
 		UI.drawString(Log.format("Jumps: {}", aerialManeuvers), 100, 100);
 		UI.drawString(Log.format("Grounded: {}", isGrounded), 100, 150);
+
+		UI.drawString(Log.format("Can Fall: {}", level.getMap().canFallThrough(transform().position, 6, new Vec2())), 100, 450);
 	}
 
 	private Vec2 onMove(Vec2 from, Vec2 to) {
@@ -178,14 +214,16 @@ public class Player extends Sprite {
 		}
 		
 		AABB aabb = getAABB();
-		Vec2 newPos = level.getMap().onMove(from, to, new Vec2(aabb.getWidth(), aabb.getHeight()));
+		Vec2 newPos = level.getMap().onMove(from, to, new Vec2(aabb.getWidth()*0.5f, aabb.getHeight()*0.5f));
 		
-		boolean ground = level.getMap().isGroundBelow(newPos);
+		boolean ground = level.getMap().isGroundBelow(newPos, 3);
 		if(!isGrounded() && ground) {
 			onGround();
 		} else if(isGrounded() && !ground) {
 			onLeaveGround();
 		}
+		
+		
 		
 		return newPos;
 	}

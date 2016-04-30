@@ -1,6 +1,8 @@
 package game;
 
 import java.awt.Color;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
@@ -13,6 +15,7 @@ import graphics.PixelImage;
 import input.Keyboard;
 import input.Mouse;
 import resources.R;
+import util.Log;
 
 public class Game extends GameLoop {
 	
