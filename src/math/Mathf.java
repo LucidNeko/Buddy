@@ -41,6 +41,14 @@ public class Mathf {
 		return (float)Math.atan(a);
 	}
 	
+	public static int sign(float x) {
+		return (int)Math.signum(x);
+	}
+	
+	public static float round(float x) {
+		return (float)Math.round(x);
+	}
+	
 	public static float random() {
 		return RANDOM.nextFloat();
 	}
@@ -81,9 +89,11 @@ public class Mathf {
 	}
 	
 	public static float smoothlerp(float a, float b, float t) {
-		Log.info(t);
-		if(t < 0 || t > 1) 
-			throw new IllegalArgumentException("t must be (0 >= t <= 1)");
+		if(t < 0 || t > 1) {
+			Log.error("t must be (0 >= t <= 1) was: {}. Clamping", t);
+			t = Mathf.clamp(t, 0, 1);
+		}
+		
 		t = smoothstep(0, 1, t);
 		return (1-t)*a + t*b;
 	}

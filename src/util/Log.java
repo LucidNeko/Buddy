@@ -34,7 +34,7 @@ public class Log {
 	}
 	
 	public static void info(String s, Object... objects) {
-		out.println("[INFO ] => " + populate(s, objects));
+		out.println("[INFO ] => " + format(s, objects));
 	}
 
 	public static void error(Object... objects) {
@@ -42,7 +42,7 @@ public class Log {
 	}
 	
 	public static void error(String s, Object... objects) {
-		out.println("[ERROR] => " + populate(s, objects));
+		out.println("[ERROR] => " + format(s, objects));
 	}
 
 	public static void warn(Object... objects) {
@@ -50,10 +50,10 @@ public class Log {
 	}
 	
 	public static void warn(String s, Object... objects) {
-		out.println("[WARN ] => " + populate(s, objects));
+		out.println("[WARN ] => " + format(s, objects));
 	}
 	
-	private static String populate(String s, Object... objects) {
+	public static String format(String s, Object... objects) {
 		for(int i = 0; s.contains("{}") && i < objects.length; i++) {
 			if(objects[i] instanceof String) {
 				//If String contains escape chars, double them up so they get escaped

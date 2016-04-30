@@ -9,6 +9,7 @@ import java.util.List;
 
 import core.IRenderable;
 import core.Sprite;
+import game.Camera;
 
 public class QuadTree implements IRenderable {
 
@@ -25,8 +26,8 @@ public class QuadTree implements IRenderable {
 	}
 
 	@Override
-	public void render(PixelImage canvas) {
-		root.render(canvas);
+	public void render(PixelImage canvas, Camera camera) {
+		root.render(canvas, camera);
 	}
 	
 	public void clear() {
@@ -126,12 +127,12 @@ public class QuadTree implements IRenderable {
 		}
 
 		@Override
-		public void render(PixelImage canvas) {
+		public void render(PixelImage canvas, Camera camera) {
 			if(split) {
-				NW.render(canvas);
-				NE.render(canvas);
-				SW.render(canvas);
-				SE.render(canvas);
+				NW.render(canvas, camera);
+				NE.render(canvas, camera);
+				SW.render(canvas, camera);
+				SE.render(canvas, camera);
 			}
 			
 			Graphics2D g = canvas.asBufferedImage().createGraphics();

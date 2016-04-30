@@ -33,16 +33,17 @@ public class IO {
 	}
 	
 	/**
-	 * Format: "name.numFrames.sprite" => "mami_run.8.sprite"
+	 * Format: "name.numFrames.sprite" => "mami_run.ms_per_frame.8.sprite"
 	 */
 	public static SpriteSheet loadSpriteSheet(String fpath) {
 		String[] data = fpath.substring(fpath.lastIndexOf("/") + 1).split("\\.");
 		String name = data[0];
-		int numFrames = Integer.parseInt(data[1]);
+		int ms = Integer.parseInt(data[1]);
+		int numFrames = Integer.parseInt(data[2]);
 		PixelImage image = loadImage(fpath);
 		
 		if(image != null) {
-			return new SpriteSheet(image, numFrames);
+			return new SpriteSheet(image, numFrames, ms / 1000f);
 		} else {
 			Log.error("Failed loading {} with error: Failed loading image", fpath);
 			return null;

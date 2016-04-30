@@ -5,24 +5,26 @@ import math.Mathf;
 public class Animation {
 	
 	private SpriteSheet.Frame[] frames;
-	private float speed;
-	private float timePerFrame;
+	private float secondsPerFrame;
 	
 	private int frame = 0;
 	private float time = 0;
 	
-	public Animation(SpriteSheet spriteSheet, float speed) {
+	public Animation(SpriteSheet spriteSheet) {
+		this(spriteSheet, spriteSheet.getSecondsPerFrame());
+	}
+	
+	public Animation(SpriteSheet spriteSheet, float secondsPerFrame) {
 		frames = spriteSheet.getFrames();
-		setSpeed(speed);
+		setSecondsPerFrame(secondsPerFrame);
 	}
 	
-	public float getSpeed() {
-		return speed;
+	public float getSecondsPerFrame() {
+		return secondsPerFrame;
 	}
 	
-	public void setSpeed(float speed) {
-		this.speed = Mathf.max(0, speed);
-		this.timePerFrame = this.speed / frames.length;
+	public void setSecondsPerFrame(float secondsPerFrame) {
+		this.secondsPerFrame = Mathf.max(0, secondsPerFrame);
 	}
 	
 	public void reset() {
@@ -32,8 +34,8 @@ public class Animation {
 	
 	public void update(float delta) {
 		time += delta;
-		if(time >= timePerFrame) {
-			time -= timePerFrame;
+		if(time >= secondsPerFrame) {
+			time -= secondsPerFrame;
 			frame = (frame+1) % frames.length;
 		}
 	}

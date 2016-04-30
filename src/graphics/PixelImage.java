@@ -1,5 +1,6 @@
 package graphics;
 
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.Arrays;
@@ -29,6 +30,10 @@ public class PixelImage implements Cloneable {
 		
 		//draw in the src image
 		this.image.createGraphics().drawImage(src, null, 0, 0);
+	}
+	
+	public Graphics2D createGraphics() {
+		return image.createGraphics();
 	}
 	
 	public boolean testBounds(int x, int y) {
@@ -142,14 +147,36 @@ public class PixelImage implements Cloneable {
 		
 		PixelImage out = new PixelImage((int)(img.width * n), (int)(img.height * n));
 		
+		float factor = 1f/n;
+		
 		for(int y = 0; y < out.height; y++) {
 			for(int x = 0; x < out.width; x++) {
-				out.setARGB(x, y, img.getARGB(x/n, y/n));
+				out.setARGB(x, y, img.getARGB((int)(x*factor), (int)(y*factor)));
 			}
 		}
 		
 		return out;
 	}
+	
+	public static PixelImage scale(PixelImage img, PixelImage out, int n) {
+		if(out.getWidth() != img.getWidth() * n || out.getHeight() != img.getHeight() * n) {
+			return img;
+		}
+		
+		if(n <= 0) { return new PixelImage(0, 0); }
+		if(n == 1) { return img.clone(); }
+		
+		float factor = 1f/n;
+		
+		for(int y = 0; y < out.height; y++) {
+			for(int x = 0; x < out.width; x++) {
+				out.setARGB(x, y, img.getARGB((int)(x*factor), (int)(y*factor)));
+			}
+		}
+		
+		return out;
+	}
+	
 	
 	public static class SubPixelImage {
 		

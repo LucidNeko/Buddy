@@ -5,9 +5,12 @@ public class SpriteSheet {
 	private PixelImage image;
 	private Frame[] frames;
 	
-	public SpriteSheet(PixelImage image, int numFrames) {
+	private float secondsPerFrame;
+	
+	public SpriteSheet(PixelImage image, int numFrames, float secondsPerFrame) {
 		this.image = image;
 		this.frames = new Frame[numFrames];
+		this.secondsPerFrame = secondsPerFrame;
 		
 		populate();
 	}
@@ -18,6 +21,10 @@ public class SpriteSheet {
 		for(int i = 0; i < frames.length; i++) {
 			frames[i] = new Frame(this, i*w, 0, w, h);
 		}
+	}
+	
+	public float getSecondsPerFrame() {
+		return secondsPerFrame;
 	}
 	
 	public PixelImage getImage() {

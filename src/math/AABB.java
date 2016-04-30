@@ -24,6 +24,15 @@ public class AABB {
 		assert(left <= right && top <= bottom);
 	}
 	
+	public AABB translate(Vec2 delta) {
+		return new AABB(
+			this.left + delta.x,
+			this.right + delta.x,
+			this.top + delta.y,
+			this.bottom + delta.y
+		);
+	}
+	
 	public Vec2 getCenter() {
 		return new Vec2(left + getWidth()/2, top + getHeight()/2);
 	}

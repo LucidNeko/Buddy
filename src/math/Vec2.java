@@ -92,6 +92,18 @@ public class Vec2 {
 	}
 	
 	// Utility
+	public Vec2 ceil() {
+		return new Vec2(Mathf.ceil(x), Mathf.ceil(y));
+	}
+	
+	public Vec2 floor() {
+		return new Vec2(Mathf.floor(x), Mathf.floor(y));
+	}
+	
+	public Vec2 round() {
+		return new Vec2(Mathf.round(x), Mathf.round(y));
+	}
+	
 	public Vec2 abs() {
 		return new Vec2(Mathf.abs(x), Mathf.abs(y));
 	}
@@ -130,14 +142,34 @@ public class Vec2 {
 		return this.x * other.x + this.y * other.y;
 	}
 	
+	public Vec2 lerp(Vec2 dest, float t) {
+		return new Vec2(Mathf.lerp(x, dest.x, t), Mathf.lerp(y, dest.y, t));
+	}
+	
+	public Vec2 slerp(Vec2 dest, float t) {
+		return new Vec2(Mathf.smoothlerp(x, dest.x, t), Mathf.smoothlerp(y, dest.y, t));
+	}
+	
+	public Vec2 sslerp(Vec2 dest, float t) {
+		return new Vec2(Mathf.smootherlerp(x, dest.x, t), Mathf.smootherlerp(y, dest.y, t));
+	}
+	
 	@Override
 	public Vec2 clone() {
 		return new Vec2(x, y);
 	}
 
+	public boolean epsilonEquals(Vec2 o) {
+		return Mathf.abs(x - o.x) < Mathf.EPSILON && Mathf.abs(y - o.y) < Mathf.EPSILON;
+	}
+	
+	public boolean equals(Vec2 o, float threshold) {
+		return Mathf.abs(x - o.x) < threshold&& Mathf.abs(y - o.y) < threshold;
+	}
+
 	@Override
 	public String toString() {
-		return "Vec2 [x=" + x + ", y=" + y + "]";
+		return String.format("Vec2 [x=%.2f, y=%.2f]", x, y);
 	}
 
 }

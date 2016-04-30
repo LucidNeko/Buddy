@@ -32,7 +32,6 @@ import javax.swing.event.ChangeListener;
 import collision.QuadTree;
 import core.Audio;
 import core.GameLoop;
-import core.Level;
 import core.Sprite;
 import physics.Particle;
 import physics.ParticleEmitter;
@@ -243,6 +242,9 @@ public class Test {
 					
 					PixelImage color = R.images.Pumpkin_C;
 					PixelImage normal = R.images.Pumpkin_N;
+					
+					color = R.images.test_diff;
+					normal = R.images.test;
 					
 					Vec2 pos = new Vec2(500, 100);
 					Vec2 mouse = new Vec2(Mouse.getX(), Mouse.getY());

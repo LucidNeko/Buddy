@@ -145,7 +145,7 @@ public class RBuilder {
 
 		@Override
 		public boolean canHandle(String fpath) {
-			return getExtension(fpath).equalsIgnoreCase("sprite");
+			return getExtension(fpath).equalsIgnoreCase("sprite") || (getExtension(fpath).equalsIgnoreCase("png") && fpath.contains("sprites"));
 		}
 
 		@Override
@@ -161,7 +161,7 @@ public class RBuilder {
 
 		@Override
 		public boolean canHandle(String fpath) {
-			return getExtension(fpath).equalsIgnoreCase("png");
+			return getExtension(fpath).equalsIgnoreCase("png") && !fpath.contains("sprites");
 		}
 
 		@Override

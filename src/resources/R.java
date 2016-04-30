@@ -17,9 +17,9 @@ public class R{
 
 	public static class images{
 		public static class hero{
-			public static final SpriteSheet mami_idle = IO.loadSpriteSheet("R/images/hero/mami_idle.7.sprite");
-			public static final SpriteSheet mami_run_left = IO.loadSpriteSheet("R/images/hero/mami_run_left.8.sprite");
-			public static final SpriteSheet mami_run_right = IO.loadSpriteSheet("R/images/hero/mami_run_right.8.sprite");
+			public static final SpriteSheet mami_idle = IO.loadSpriteSheet("R/images/hero/mami_idle.450.7.sprite");
+			public static final SpriteSheet mami_run_left = IO.loadSpriteSheet("R/images/hero/mami_run_left.450.8.sprite");
+			public static final SpriteSheet mami_run_right = IO.loadSpriteSheet("R/images/hero/mami_run_right.450.8.sprite");
 		}
 
 		public static class terrain{
@@ -28,8 +28,69 @@ public class R{
 
 		public static final PixelImage Pumpkin_C = IO.loadImage("R/images/Pumpkin_C.png");
 		public static final PixelImage Pumpkin_N = IO.loadImage("R/images/Pumpkin_N.png");
-		public static final PixelImage level_0000_foreground = IO.loadImage("R/images/level_0000_foreground.png");
-		public static final PixelImage level_0001_collision = IO.loadImage("R/images/level_0001_collision.png");
-		public static final PixelImage level_0002_background = IO.loadImage("R/images/level_0002_background.png");
+		public static final SpriteSheet idlebig = IO.loadSpriteSheet("R/images/idlebig.100.6.sprite");
+		public static final SpriteSheet idlesmall = IO.loadSpriteSheet("R/images/idlesmall.100.6.sprite");
+		public static final PixelImage test = IO.loadImage("R/images/test.png");
+		public static final PixelImage test_diff = IO.loadImage("R/images/test_diff.png");
+		public static final PixelImage test_diff2 = IO.loadImage("R/images/test_diff2.png");
+		public static final PixelImage test_diff3 = IO.loadImage("R/images/test_diff3.png");
+	}
+
+	public static class levels{
+		public static class level000{
+			public static final PixelImage Level01_PATH = IO.loadImage("R/levels/level000/Level01_PATH.png");
+			public static final PixelImage Level01_bg = IO.loadImage("R/levels/level000/Level01_bg.png");
+			public static final PixelImage Level01_decorations = IO.loadImage("R/levels/level000/Level01_decorations.png");
+			public static final PixelImage Level01_hazards = IO.loadImage("R/levels/level000/Level01_hazards.png");
+			public static final PixelImage Level01_oneside = IO.loadImage("R/levels/level000/Level01_oneside.png");
+			public static final PixelImage Level01_preview = IO.loadImage("R/levels/level000/Level01_preview.png");
+			public static final PixelImage Level01_world = IO.loadImage("R/levels/level000/Level01_world.png");
+			public static final PixelImage background = IO.loadImage("R/levels/level000/background.png");
+			public static final PixelImage background2 = IO.loadImage("R/levels/level000/background2.png");
+			public static final PixelImage background3 = IO.loadImage("R/levels/level000/background3.png");
+			public static final PixelImage background4 = IO.loadImage("R/levels/level000/background4.png");
+			public static final PixelImage background5 = IO.loadImage("R/levels/level000/background5.png");
+			public static final PixelImage background6 = IO.loadImage("R/levels/level000/background6.png");
+			public static final PixelImage background7 = IO.loadImage("R/levels/level000/background7.png");
+			public static final PixelImage tiles = IO.loadImage("R/levels/level000/tiles.8.8.sprite.png");
+		}
+
+		public static class level001{
+		}
+
+		public static class test{
+			public static final PixelImage background = IO.loadImage("R/levels/test/background.png");
+			public static final PixelImage collision = IO.loadImage("R/levels/test/collision.png");
+			public static final PixelImage foreground = IO.loadImage("R/levels/test/foreground.png");
+		}
+	}
+
+	public static class sprites{
+		public static class enemies{
+			public static class walky{
+				public static final SpriteSheet idle = IO.loadSpriteSheet("R/sprites/enemies/walky/idle.250.2.sprite");
+				public static final SpriteSheet walk = IO.loadSpriteSheet("R/sprites/enemies/walky/walk.250.2.sprite");
+			}
+		}
+
+		public static class player{
+			public static final SpriteSheet airborn_left = IO.loadSpriteSheet("R/sprites/player/airborn_left.120.1.png");
+			public static final SpriteSheet airborn_right = IO.loadSpriteSheet("R/sprites/player/airborn_right.120.1.png");
+			public static final SpriteSheet die_left = IO.loadSpriteSheet("R/sprites/player/die_left.120.1.png");
+			public static final SpriteSheet die_right = IO.loadSpriteSheet("R/sprites/player/die_right.120.1.png");
+			public static final SpriteSheet idle_left = IO.loadSpriteSheet("R/sprites/player/idle_left.120.3.png");
+			public static final SpriteSheet idle_right = IO.loadSpriteSheet("R/sprites/player/idle_right.120.3.png");
+			public static final SpriteSheet jump_left = IO.loadSpriteSheet("R/sprites/player/jump_left.120.3.png");
+			public static final SpriteSheet jump_right = IO.loadSpriteSheet("R/sprites/player/jump_right.120.3.png");
+			public static final SpriteSheet walk_right = IO.loadSpriteSheet("R/sprites/player/walk_right.120.3.png");
+			public static final SpriteSheet wall_slide = IO.loadSpriteSheet("R/sprites/player/wall_slide.100.1.png");
+			public static final SpriteSheet wallcling_left = IO.loadSpriteSheet("R/sprites/player/wallcling_left.120.1.png");
+			public static final SpriteSheet wallcling_right = IO.loadSpriteSheet("R/sprites/player/wallcling_right.120.1.png");
+			public static final SpriteSheet walljump_left = IO.loadSpriteSheet("R/sprites/player/walljump_left.120.3.png");
+			public static final SpriteSheet walljump_right = IO.loadSpriteSheet("R/sprites/player/walljump_right.120.3.png");
+		}
+
+		public static class tilesets{
+		}
 	}
 }
