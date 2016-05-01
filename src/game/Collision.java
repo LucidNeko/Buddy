@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 import core.Sprite;
+import ecs100.UI;
 import graphics.PixelImage;
 import math.AABB;
 import math.Vec2;
@@ -18,32 +19,32 @@ public class Collision {
 	}
 	
 	public Collision(PixelImage image) {
-		this.image = image;
+		this.image = image.clone();
 		
-//		for(int y = 0; y < image.getHeight(); y++) {
-//			for(int x = 0; x < image.getWidth(); x++) {//				
-//				int left = -1;
-//				int right = -1;
-//				int up = -1;
-//				int upp = -1;
-//				int down = -1;
-//				
-//				if(image.testBounds(x-1, y)) left = image.getAlpha(x-1, y);
-//				if(image.testBounds(x+1, y)) right = image.getAlpha(x+1, y);
-//				if(image.testBounds(x, y-1)) up = image.getAlpha(x, y-1);
-//				if(image.testBounds(x, y+1)) down = image.getAlpha(x, y+1);
-//				
-//				int count = 0;
-//				if(left != 0) count++;
-//				if(right != 0) count++;
-//				if(up != 0) count++;
-//				if(down != 0) count++;
-//				
-//				if(count >= 3) {
-//					image.setARGB(x, y, 0xFF000000);
-//				}
-//			}
-//		}
+		for(int y = 0; y < image.getHeight(); y++) {
+			for(int x = 0; x < image.getWidth(); x++) {//				
+				int left = -1;
+				int right = -1;
+				int up = -1;
+				int upp = -1;
+				int down = -1;
+				
+				if(image.testBounds(x-1, y)) left = image.getAlpha(x-1, y);
+				if(image.testBounds(x+1, y)) right = image.getAlpha(x+1, y);
+				if(image.testBounds(x, y-1)) up = image.getAlpha(x, y-1);
+				if(image.testBounds(x, y+1)) down = image.getAlpha(x, y+1);
+				
+				int count = 0;
+				if(left != 0) count++;
+				if(right != 0) count++;
+				if(up != 0) count++;
+				if(down != 0) count++;
+				
+				if(count >= 3) {
+					this.image.setARGB(x, y, 0xFF000000);
+				}
+			}
+		}
 		
 	}
 	
@@ -71,7 +72,7 @@ public class Collision {
 			if(!image.testBounds(pos.x(), pos.y())) {
 				return false;
 			}
-			
+
 			if(image.getAlpha(pos.x(), pos.y()) != 0) {
 				out.end = new Vec2(lastPos);
 				out.sprite = Sprite.get(image.getARGB(pos.x(), pos.y()));
@@ -155,19 +156,22 @@ public class Collision {
 	}
 	
 	public void clear() {
-		image.fill(0);
+		image.fill(0x00000000);
 	}
 	
 	public void add(Sprite sprite) {
-		AABB box = sprite.getCollisionAABB();
 		
-		Graphics2D g = image.createGraphics();
+		sprite.renderIDMask(image);
 		
-		int id = sprite.getID();
-		Color color = new Color(id >> 16 & 0xFF, id >> 8 & 0xFF, id & 0xFF);
-		g.setColor(color);
-		g.fillRect((int)(box.left), (int)(box.top), (int)(box.right - box.left), (int)(box.bottom - box.top));
-		g.dispose();
+//		AABB box = sprite.getCollisionAABB();
+//		
+//		Graphics2D g = image.createGraphics();
+//		
+//		int id = sprite.getID();
+//		Color color = new Color(id >> 16 & 0xFF, id >> 8 & 0xFF, id & 0xFF);
+//		g.setColor(color);
+//		g.fillRect((int)(box.left), (int)(box.top), (int)(box.right - box.left), (int)(box.bottom - box.top));
+//		g.dispose();
 	}
 	
 	

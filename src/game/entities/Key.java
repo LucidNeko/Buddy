@@ -2,28 +2,42 @@ package game.entities;
 
 import core.Sprite;
 import game.Camera;
-import game.Pickup;
+import game.Interactable;
+import game.Player;
 import graphics.PixelImage;
 import graphics.SpriteSheet;
 import math.AABB;
+import math.Transform;
 import math.Vec2;
 import resources.R;
 
-public class Key extends Sprite implements Pickup {
+public class Key extends Sprite implements Interactable {
 	
 	private PixelImage image = R.images.key;
 	
-	public Key() {
-		
+	private Sprite owner;
+	
+	private Transform target;
+	
+	public Key(Transform target) {
+		this.target = target;
 	}
 	
 	@Override
-	public void onPickup(Sprite source) {
-		
+	public void interact(Sprite source) {
+		owner = source;
 	}
 
 	@Override
-	public void update(float delta) { }
+	public void update(float delta) { 
+		if(owner != null) {
+			transform().position = owner.transform().position.add(14, 0); 
+		}
+		
+		if(owner != null && this.transform().position.sub(target.position).length() < 8) {
+			((Player)owner).getLevel().endLevel();
+		}
+	}
 	
 	@Override
 	public AABB getAABB() {
@@ -39,9 +53,11 @@ public class Key extends Sprite implements Pickup {
 	}
 	
 	@Override
-	public void renderIDMask(PixelImage canvas, Camera camera) {
-		AABB aabb = camera.transform(getAABB());
-		canvas.blit(image, (int)aabb.left, (int)aabb.top, getID());
+	public void renderIDMask(PixelImage canvas) {
+		if(owner == null) {
+			AABB aabb = getAABB();
+			canvas.blit(image, (int)aabb.left, (int)aabb.top, getID());
+		}
 	}
 
 }

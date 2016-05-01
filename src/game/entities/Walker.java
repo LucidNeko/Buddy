@@ -1,4 +1,4 @@
-package game;
+package game.entities;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -6,7 +6,11 @@ import java.awt.Graphics2D;
 import core.Audio;
 import core.Sprite;
 import ecs100.UI;
+import game.Camera;
 import game.Collision.Result;
+import game.Enemy;
+import game.Killable;
+import game.Level;
 import graphics.Animation;
 import graphics.AnimationState;
 import graphics.Animator;
@@ -21,61 +25,30 @@ import math.Vec2;
 import resources.R;
 import util.Log;
 
-public class Player extends Sprite implements Killable {
-	
-	private final int MAX_AERIAL_MANEUVERS = 10;
-	
-	private Controller controller;
+public class Walker extends Sprite implements Killable, Enemy {
 
 	private Animator animator;
 
 	private Vec2 velocity = new Vec2();
 	private Vec2 forces = new Vec2(0, 1600f);
-	private float moveSpeed = 120f;
+	private float moveSpeed = 60f;
 	private float maxFallSpeed = 300f;
 	private Level level;
 	
 	private boolean dead = false;
+	private boolean isGrounded = false;
+	private boolean flash = false;
 	
 	private boolean killTriggered = false;
 	
-	float respawnCounter = 2f;
-	
-	private int aerialManeuvers = MAX_AERIAL_MANEUVERS;
-
-	private boolean isGrounded = false;
-	
-	private boolean flash = false;
-
-	private boolean isDownDoubleTap = false;
-	private TapTimer downDoubleTapTimer = new TapTimer() {
-
-		@Override
-		public boolean onDoubleTap() {
-			return isDownDoubleTap = true;
-		}
-
-		@Override
-		public boolean isTap() {
-			return controller.downOnce();
-		}
-
-		@Override
-		public boolean onDoubleTapOff() {
-			return isDownDoubleTap = false;
-		}
-		
-	};
-	
-	public Player(Controller controller) {
+	public Walker() {
 		super();
-		this.controller = controller;
+		AnimationState idleLeftState = new AnimationState(new Animation(R.sprites.enemies.walky.idle_left));
+		AnimationState idleRightState = new AnimationState(new Animation(R.sprites.enemies.walky.idle_right));
+		AnimationState leftState = new AnimationState(new Animation(R.sprites.enemies.walky.walk_left));
+		AnimationState rightState = new AnimationState(new Animation(R.sprites.enemies.walky.walk_right));
 		
-		AnimationState idleLeftState = new AnimationState(new Animation(R.sprites.player.idle_left));
-		AnimationState idleRightState = new AnimationState(new Animation(R.sprites.player.idle_right));
-		AnimationState leftState = new AnimationState(new Animation(R.sprites.player.idle_left));
-		AnimationState rightState = new AnimationState(new Animation(R.sprites.player.idle_right));
-		
+		velocity.x = moveSpeed;
 		
 		idleLeftState.addTransition(new Predicate() {
 
@@ -143,63 +116,43 @@ public class Player extends Sprite implements Killable {
 	}
 	
 	public String getName() {
-		return controller == Controller.P1 ? "P1" : "P2";
+		return "Walky";
 	}
 	
 	@Override
 	public void update(float delta) {
-		if(!dead && (killTriggered || level.getMap().getCollisionLayer().isOutOfBounds(transform().position) || level.getMap().isOnHazard(transform().position, 3))) {
+		if(!dead && (killTriggered || (level.getMap().getCollisionLayer().isOutOfBounds(transform().position)))) {
 			dead = true;
 			velocity.y = -forces.y * 0.3f; // Fake jump
 			velocity.x = 0;
 			flash = true;
-			Audio.play(R.audio.hurt);
+			Audio.play(R.audio.enemydie);
 		}
-		
-		if(!dead) {
-			Vec2 move = new Vec2();
-			if(controller.left()) move.x -= 1;
-			if(controller.right()) move.x += 1;
-			velocity.x = move.x * moveSpeed;
-	
-			if(isGrounded() || aerialManeuvers > 0) {
-				if(controller.upOnce()) {
-					Audio.play(R.audio.jump_alt);
-					velocity.y = -forces.y * 0.25f;
-					if(!isGrounded()) aerialManeuvers--;
-				}
-			}
-		}
-		
-		if(dead) {
-			respawnCounter -= delta;
-			if(respawnCounter <= 0) {
-				level.reset();//GameMaps.getRandomMap());
-			}
-		}
-		
-		downDoubleTapTimer.update(delta);
-		
-		Vec2 outUnder = new Vec2();
-		if(!dead && level.getMap().isGroundBelow(transform().position, 1) && level.getMap().canFallThrough(transform().position, 8, outUnder)) {
-			if(this.isDownDoubleTap) {
-				transform().position.set(outUnder);
-				this.downDoubleTapTimer.reset();
-			}
-		}
-		
-//		if(Mathf.abs(transform().position.length() - transform().position.round().length()) < 0.4f) {
-//			transform().position = transform().position.round();
-//		}
 
 		Transform transform = transform();
 		velocity.y = Mathf.min(velocity.y, maxFallSpeed);
+		
+		int sign = Mathf.sign(velocity.x);
+		velocity.x = sign * moveSpeed;
+		Result result = new Result();
+		if(level.getMap().getCollisionLayer().raycast(transform.position, new Vec2(sign, 0), result)) {
+			if(result.distanceTravelled < 2) {
+				velocity.x = -sign * moveSpeed;
+			}
+		}
+		
+		
 		Vec2 forces = new Vec2(this.forces);
 		
 		Vec2 newPosition = transform.position.add(velocity.mul(delta)).add(forces.mul(0.5f).mul(delta*delta));
 		velocity = velocity.add(forces.mul(delta));
 		
-		
+		Vec2 dir = newPosition.sub(transform.position);
+		if(dir.x <= 0 && velocity.x > 0) {
+			velocity.x = -moveSpeed;
+		} else if(dir.x >= 0 && velocity.x < 0) {
+			velocity.x = moveSpeed;
+		}
 		
 		newPosition = onMove(transform.position, newPosition);
 		newPosition = level.getMap().getFreePointAroundIfOOB(newPosition);
@@ -209,12 +162,6 @@ public class Player extends Sprite implements Killable {
 		if(this.animator != null) {
 			this.animator.update(delta);
 		}
-		
-//		UI.setColor(Color.GREEN);
-//		UI.drawString(Log.format("OOB: {}", level.getMap().getCollisionLayer().collide(transform().position)), 100, 100);
-//		UI.drawString(Log.format("Grounded: {}", isGrounded), 100, 150);
-//
-//		UI.drawString(Log.format("Can Fall: {}", level.getMap().canFallThrough(transform().position, 6, new Vec2())), 100, 450);
 	}
 
 	private Vec2 onMove(Vec2 from, Vec2 to) {
@@ -247,7 +194,6 @@ public class Player extends Sprite implements Killable {
 	
 	private void onGround() {
 		isGrounded = true;
-		aerialManeuvers = MAX_AERIAL_MANEUVERS;
 	}
 	
 	private void onLeaveGround() {
@@ -290,20 +236,20 @@ public class Player extends Sprite implements Killable {
 			else
 				canvas.blit(frame.getImage(), pos.x(), pos.y());
 			
-			Graphics2D g = canvas.createGraphics();
-			g.setColor(Color.yellow);
-			g.setFont(R.fonts.kenpixel_mini_square.deriveFont(8f));
-			float hw = g.getFontMetrics().stringWidth(getName()) * 0.5f;
-			hw = aabb.getWidth()*0.5f - hw;
-			g.drawString(getName(), aabb.left + hw, aabb.top);
-			g.dispose();
+//			Graphics2D g = canvas.createGraphics();
+//			g.setColor(Color.yellow);
+//			g.setFont(R.fonts.kenpixel_mini_square.deriveFont(8f));
+//			float hw = g.getFontMetrics().stringWidth(getName()) * 0.5f;
+//			hw = aabb.getWidth()*0.5f - hw;
+//			g.drawString(getName(), aabb.left + hw, aabb.top);
+//			g.dispose();
 		}
 //		super.render(canvas, camera);
 	}
 	
 	@Override
 	public void renderIDMask(PixelImage canvas) {
-		if(animator != null) {
+		if(animator != null && !dead) {
 			AABB aabb = getAABB();
 			SpriteSheet.Frame frame = animator.getAnimation().getFrame();
 			Vec2 pos = new Vec2(aabb.left, aabb.top);

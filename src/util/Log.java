@@ -59,7 +59,9 @@ public class Log {
 				//If String contains escape chars, double them up so they get escaped
 				objects[i] = ((String)(objects[i])).replaceAll("\\\\", "\\\\\\\\");
 			}
-			s = s.replaceFirst("\\{\\}", objects[i].toString());
+			if(objects[i] != null) {
+				s = s.replaceFirst("\\{\\}", objects[i].toString());
+			}
 		}
 		return s;
 	}

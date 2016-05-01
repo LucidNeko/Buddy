@@ -1,15 +1,19 @@
 package game;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
 import core.IRenderable;
 import core.Sprite;
+import ecs100.UI;
 import game.Collision.Result;
+import game.entities.Door;
 import graphics.PixelImage;
 import math.Mathf;
 import math.Vec2;
 import resources.R;
+import util.Log;
 
 public abstract class GameMap {
 
@@ -21,19 +25,119 @@ public abstract class GameMap {
 	protected Collision collision;
 	protected Collision dynamicCollision;
 	
+	protected List<Sprite> entities = new ArrayList<Sprite>();
+	
 	public GameMap() { 
 		init();
 	}
 	
 	public abstract void init();
 	
-	public Vec2 onMove(Vec2 from, Vec2 to, Vec2 halfSize) {
+	public void clear() {
+		background.clear();
+		world.clear();
+		hazards.clear();
+		foreground.clear();
+		entities.clear();
+	}
+	
+	public Vec2 onMove(Vec2 from, Vec2 to, Vec2 halfSize, Sprite source) {
 		Vec2 pos = onMove(from, to, halfSize, collision);
 		
 		
+		if(source instanceof Player) {
+			Player player = (Player)source;
+			
+			UI.setColor(Color.GREEN);
+			
+			Sprite sprite;
+			
+			sprite = checkSpriteBeside(from.sub(0, halfSize.y), 2);
+			if(sprite != null) {
+				if(sprite instanceof Door) {
+					Vec2 cpos = onMove(from, to, halfSize, dynamicCollision);
+					
+					int sign = Mathf.sign(to.sub(from).x);
+					
+					if(sign < 0) {
+						pos.x  = Mathf.max(pos.x, cpos.x);
+					} else if(sign > 0) {
+						pos.x  = Mathf.min(pos.x, cpos.x);
+					}
+					return pos;
+				}
+			}
+			
+			sprite = checkSpriteUnder(from.sub(0, halfSize.y), 2);
+			if(sprite != null) {
+				if(sprite instanceof Interactable) {
+					((Interactable)sprite).interact(source);
+					return pos;
+				}
+			}
+			
+			sprite = checkSpriteUnder(from.sub(0, halfSize.y), 2);
+			if(sprite != null) {
+				if(sprite instanceof Interactable) {
+					((Interactable)sprite).interact(source);
+					return pos;
+				}
+			}
+			
+			sprite = checkSpriteUnder(from.add(0, 0), 6);
+			if(sprite != null) {
+				if(sprite instanceof Killable) {
+					((Killable)sprite).kill();
+					return pos;
+				}
+			}
+			
+			sprite = checkSpriteOver(from, 4);
+			if(sprite != null && sprite instanceof Enemy) {
+				player.kill();
+				return pos;
+			}
+		}			
 		
 		return pos;
 	}
+	
+	private Sprite checkSpriteBeside(Vec2 from, float maxDistance) {
+		Result result = new Result();
+		if(dynamicCollision.raycast(from, new Vec2(-1, 0), result)) {
+			if(result.sprite != null && result.distanceTravelled < maxDistance) {
+				return result.sprite;
+			}
+		}
+		if(dynamicCollision.raycast(from, new Vec2(1, 0), result)) {
+			if(result.sprite != null && result.distanceTravelled < maxDistance) {
+				return result.sprite;
+			}
+		}
+		return null;
+	}
+	
+	private Sprite checkSpriteUnder(Vec2 from, float maxDistance) {
+		Result result = new Result();
+		if(dynamicCollision.raycast(from, new Vec2(0, 1), result)) {
+			if(result.sprite != null && result.distanceTravelled < maxDistance) {
+				return result.sprite;
+			}
+		}
+		return null;
+	}
+	
+	private Sprite checkSpriteOver(Vec2 from, float maxDistance) {
+		Result result = new Result();
+		if(dynamicCollision.raycast(from, new Vec2(0, -1), result)) {
+			if(result.sprite != null && result.distanceTravelled < maxDistance) {
+				return result.sprite;
+			}
+		}
+		return null;
+	}
+	
+	
 	
 	private Vec2 onMove(Vec2 from, Vec2 to, Vec2 halfSize, Collision collision) {		
 		Result result = new Result();
@@ -158,6 +262,34 @@ public abstract class GameMap {
 			}
 		}
 		return result;
+	}
+	
+	public Vec2 getFreePointAroundIfOOB(Vec2 pos) {
+		if(!collision.collide(pos)) {
+			return pos;
+		}
+		
+		if(!collision.collide(pos.sub(1, 0))) {
+			return pos.sub(1, 0);
+		}
+		
+		if(!collision.collide(pos.add(1, 0))) {
+			return pos.add(1, 0);
+		}
+		
+		if(!collision.collide(pos.sub(0, 1))) {
+			return pos.sub(0, 1);
+		}
+		
+		if(!collision.collide(pos.add(0, 1))) {
+			return pos.add(0, 1);
+		}
+		
+		return pos;
+	}
+	
+	public List<Sprite> getEntities() {
+		return entities;
 	}
 	
 	public int getWidth() {

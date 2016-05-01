@@ -5,11 +5,13 @@ import java.awt.Graphics2D;
 import java.util.HashMap;
 import java.util.Map;
 
+import ecs100.UI;
 import game.Camera;
 import graphics.PixelImage;
 import math.AABB;
 import math.Transform;
 import math.Vec2;
+import util.Log;
 
 public abstract class Sprite implements IUpdateable, IRenderable {
 	
@@ -19,10 +21,13 @@ public abstract class Sprite implements IUpdateable, IRenderable {
 	private Transform transform = new Transform();
 	
 	private int id;
+	{
+		id = NEXT_ID;
+		sprites.put(NEXT_ID++, this);
+	}
 	
 	public Sprite() {
-		id = NEXT_ID++;
-		sprites.put(NEXT_ID++, this);
+		Log.info("ID: {}", Integer.toHexString(getID()));
 	}
 	
 	public int getID() {
@@ -56,7 +61,7 @@ public abstract class Sprite implements IUpdateable, IRenderable {
 		}
 	}
 	
-	public void renderIDMask(PixelImage canvas, Camera camera) { }
+	public void renderIDMask(PixelImage canvas) { }
 	
 	private static int NEXT_ID = 0xFF000000;
 	private static Map<Integer, Sprite> sprites = new HashMap<Integer, Sprite>();

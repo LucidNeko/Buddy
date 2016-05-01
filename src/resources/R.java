@@ -47,7 +47,9 @@ public class R{
 			public static final PixelImage test_diff3 = IO.loadImage("R/images/test/test_diff3.png");
 		}
 
+		public static final PixelImage door = IO.loadImage("R/images/door.png");
 		public static final PixelImage key = IO.loadImage("R/images/key.png");
+		public static final PixelImage keyhole = IO.loadImage("R/images/keyhole.png");
 	}
 
 	public static class levels{
@@ -77,6 +79,12 @@ public class R{
 			public static final PixelImage Level02_oneside = IO.loadImage("R/levels/level001/Level02_oneside.png");
 			public static final PixelImage Level02_preview = IO.loadImage("R/levels/level001/Level02_preview.png");
 			public static final PixelImage Level02_world = IO.loadImage("R/levels/level001/Level02_world.png");
+			public static final PixelImage background_wide_1 = IO.loadImage("R/levels/level001/background_wide_1.png");
+			public static final PixelImage background_wide_2 = IO.loadImage("R/levels/level001/background_wide_2.png");
+			public static final PixelImage background_wide_3 = IO.loadImage("R/levels/level001/background_wide_3.png");
+			public static final PixelImage background_wide_4 = IO.loadImage("R/levels/level001/background_wide_4.png");
+			public static final PixelImage background_wide_5 = IO.loadImage("R/levels/level001/background_wide_5.png");
+			public static final PixelImage background_wide_6 = IO.loadImage("R/levels/level001/background_wide_6.png");
 		}
 
 		public static class test{
@@ -87,10 +95,17 @@ public class R{
 	}
 
 	public static class sprites{
+		public static class button{
+			public static final SpriteSheet down = IO.loadSpriteSheet("R/sprites/button/down.100.1.png");
+			public static final SpriteSheet up = IO.loadSpriteSheet("R/sprites/button/up.100.1.png");
+		}
+
 		public static class enemies{
 			public static class walky{
-				public static final SpriteSheet idle = IO.loadSpriteSheet("R/sprites/enemies/walky/idle.250.2.sprite");
-				public static final SpriteSheet walk = IO.loadSpriteSheet("R/sprites/enemies/walky/walk.250.2.sprite");
+				public static final SpriteSheet idle_left = IO.loadSpriteSheet("R/sprites/enemies/walky/idle_left.250.2.sprite");
+				public static final SpriteSheet idle_right = IO.loadSpriteSheet("R/sprites/enemies/walky/idle_right.250.2.sprite");
+				public static final SpriteSheet walk_left = IO.loadSpriteSheet("R/sprites/enemies/walky/walk_left.100.2.sprite");
+				public static final SpriteSheet walk_right = IO.loadSpriteSheet("R/sprites/enemies/walky/walk_right.100.2.sprite");
 			}
 		}
 

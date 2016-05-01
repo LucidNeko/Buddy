@@ -5,6 +5,9 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.Arrays;
 
+import math.Mathf;
+import util.Log;
+
 
 public class PixelImage implements Cloneable {
 	
@@ -116,6 +119,30 @@ public class PixelImage implements Cloneable {
 					int alpha = img.getARGB(srcX, srcY) >> 24 & 0xFF;
 					if(alpha != 0) {
 						this.setARGB(dstX, dstY, colorOverride);
+					}
+				}
+			}
+		}
+	}
+	
+	public void blitBlend(PixelImage img, int x, int y, int color) {
+		if(x + img.getWidth() < 0 || y + img.getHeight() < 0 || x >= width || y >= height) {
+			return;
+		}
+		
+		for(int srcY = 0; srcY < img.getHeight(); srcY++) {
+			for(int srcX = 0; srcX < img.getWidth(); srcX++) {
+				int dstX = x + srcX;
+				int dstY = y + srcY;
+				if(dstX >= 0 && dstX < this.getWidth() && dstY >= 0 && dstY < this.getHeight()) {
+					int alpha = img.getARGB(srcX, srcY) >> 24 & 0xFF;
+					if(alpha != 0) {
+						int srcColor = img.getARGB(srcX, srcY);
+						int dstR = (int) Mathf.clamp((srcColor >> 16 & 0xFF) + (color >> 16 & 0xFF), 0, 255); 
+						int dstG = (int) Mathf.clamp((srcColor >>  8 & 0xFF) + (color >>  8 & 0xFF), 0, 255); 
+						int dstB = (int) Mathf.clamp((srcColor >>      0xFF) + (color >>      0xFF), 0, 255); 
+						Log.info(dstR, dstG, dstB, Integer.toHexString(0xFF << 24 | dstR << 16 | dstG << 8 | dstB));
+						this.setARGB(dstX, dstY, 0xFF000000 | (dstR << 16) | (dstG << 8) | dstB);
 					}
 				}
 			}
