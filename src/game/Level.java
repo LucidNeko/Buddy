@@ -13,6 +13,7 @@ import core.IUpdateable;
 import core.Sprite;
 import ecs100.UI;
 import game.GameMap.Layer;
+import game.entities.Timer;
 import game.entities.Walker;
 import graphics.PixelImage;
 import input.Keyboard;
@@ -36,6 +37,8 @@ public class Level implements IUpdateable, IRenderable {
 	private boolean reset = false;
 	
 	private Clip clip = Audio.loop(R.audio.a_bannanas_ages);;
+	
+	Timer timer;
 	
 	public Level() {
 		reset();
@@ -68,6 +71,9 @@ public class Level implements IUpdateable, IRenderable {
 			camera.setTargets(player, player2);
 		
 		rope = new Rope(player, player2, 32);
+		
+		timer = new Timer();
+		timer.transform().position.set(2, 10);
 		
 //		if(clip != null && clip.isOpen()) {
 //			clip.close();
@@ -108,6 +114,8 @@ public class Level implements IUpdateable, IRenderable {
 		player.update(delta);
 		player2.update(delta);
 		camera.update(delta);
+		
+		timer.update(delta);
 		
 //		UI.drawString(Log.format("Pos: {}", player.transform().position.length()), 100, 300);
 //		UI.drawString(Log.format("Pos: {}", player.transform().position.round().length()), 100, 350);
@@ -159,6 +167,8 @@ public class Level implements IUpdateable, IRenderable {
 			canvas.blit(layer.getImage(), pos.x(), pos.y());
 		}
 		
+		timer.render(canvas, camera);
+		
 //		renderCollisionLayers(canvas, camera);
 //		canvas.clear();
 //		Vec2 tr = new Vec2();
@@ -182,6 +192,7 @@ public class Level implements IUpdateable, IRenderable {
 	}
 
 	public void endLevel() {
+		Audio.play(R.audio.woo);
 		this.reset();
 	}
 

@@ -1,5 +1,6 @@
 package game.entities;
 
+import core.Audio;
 import core.Sprite;
 import game.Camera;
 import game.Interactable;
@@ -26,6 +27,7 @@ public class Key extends Sprite implements Interactable {
 	@Override
 	public void interact(Sprite source) {
 		owner = source;
+		Audio.play(R.audio.coin);
 	}
 
 	@Override

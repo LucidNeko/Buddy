@@ -1,5 +1,6 @@
 package game.entities;
 
+import core.Audio;
 import core.Sprite;
 import game.Camera;
 import game.Interactable;
@@ -68,8 +69,11 @@ public class Button extends Sprite implements Interactable {
 
 	@Override
 	public void interact(Sprite source) {
-		pressed = true;
-		moving = true;
+		if(!pressed) {
+			pressed = true;
+			moving = true;
+			Audio.play(R.audio.explosion);
+		}
 	}
 
 	@Override

@@ -23,7 +23,7 @@ import util.Log;
 
 public class Player extends Sprite implements Killable {
 	
-	private final int MAX_AERIAL_MANEUVERS = 10;
+	private final int MAX_AERIAL_MANEUVERS = 1;
 	
 	private Controller controller;
 
