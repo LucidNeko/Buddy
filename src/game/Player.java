@@ -5,7 +5,6 @@ import java.awt.Graphics2D;
 
 import core.Audio;
 import core.Sprite;
-import ecs100.UI;
 import game.Collision.Result;
 import graphics.Animation;
 import graphics.AnimationState;

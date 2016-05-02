@@ -6,7 +6,6 @@ import java.util.List;
 
 import core.IRenderable;
 import core.Sprite;
-import ecs100.UI;
 import game.Collision.Result;
 import game.entities.Door;
 import graphics.PixelImage;
@@ -47,8 +46,6 @@ public abstract class GameMap {
 		
 		if(source instanceof Player) {
 			Player player = (Player)source;
-			
-			UI.setColor(Color.GREEN);
 			
 			Sprite sprite;
 			

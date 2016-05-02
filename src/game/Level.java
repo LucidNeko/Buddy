@@ -11,7 +11,6 @@ import core.Audio;
 import core.IRenderable;
 import core.IUpdateable;
 import core.Sprite;
-import ecs100.UI;
 import game.GameMap.Layer;
 import game.entities.Timer;
 import game.entities.Walker;

@@ -5,7 +5,6 @@ import java.awt.Graphics2D;
 import java.util.HashMap;
 import java.util.Map;
 
-import ecs100.UI;
 import game.Camera;
 import graphics.PixelImage;
 import math.AABB;

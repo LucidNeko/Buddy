@@ -7,7 +7,6 @@ import java.awt.Graphics2D;
 import core.IRenderable;
 import core.IUpdateable;
 import core.Sprite;
-import ecs100.UI;
 import graphics.PixelImage;
 import math.Mathf;
 import math.Vec2;

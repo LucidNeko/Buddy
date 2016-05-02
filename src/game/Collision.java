@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 import core.Sprite;
-import ecs100.UI;
 import graphics.PixelImage;
 import math.AABB;
 import math.Vec2;
