@@ -159,7 +159,14 @@ public class Player extends Sprite implements Killable {
 			Vec2 move = new Vec2();
 			if(controller.left()) move.x -= 1;
 			if(controller.right()) move.x += 1;
-			velocity.x = move.x * moveSpeed;
+//			if(isGrounded())
+				velocity.x = move.x * moveSpeed;
+//			else
+//				velocity.x += move.x * moveSpeed;
+//			
+//			{
+//				velocity.x = Mathf.clamp(velocity.x, -this.maxFallSpeed, this.maxFallSpeed);
+//			}
 	
 			if(isGrounded() || aerialManeuvers > 0) {
 				if(controller.upOnce()) {

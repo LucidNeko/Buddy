@@ -12,13 +12,14 @@ import math.Transform;
 import math.Vec2;
 import util.Log;
 
-public abstract class Sprite implements IUpdateable, IRenderable {
+public abstract class Sprite implements IUpdateable, IRenderable, Comparable<Sprite> {
 	
 	private final int DEFAULT_WIDTH = 50;
 	private final int DEFAULT_HEIGHT = 50;
 
 	private Transform transform = new Transform();
 	
+	private float layer;
 	private int id;
 	{
 		id = NEXT_ID;
@@ -31,6 +32,14 @@ public abstract class Sprite implements IUpdateable, IRenderable {
 	
 	public int getID() {
 		return id;
+	}
+	
+	public float getLayer() {
+		return layer;
+	}
+	
+	public void setLayer(float layer) {
+		this.layer = layer;
 	}
 	
 	public Transform transform() {
@@ -67,6 +76,14 @@ public abstract class Sprite implements IUpdateable, IRenderable {
 	
 	public static Sprite get(int ID) {
 		return sprites.get(ID);
+	}
+	
+	@Override
+	public int compareTo(Sprite that) {
+		if(this.layer == that.layer) {
+//			return this.
+		}
+		return 0;
 	}
 	
 }
