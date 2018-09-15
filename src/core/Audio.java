@@ -8,6 +8,7 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.Control;
 import javax.sound.sampled.Control.Type;
+import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineEvent;
 import javax.sound.sampled.LineListener;
 import javax.sound.sampled.LineUnavailableException;
@@ -55,7 +56,8 @@ public class Audio {
 	private static Clip loadClip(byte[] data) {
 		try {
 			AudioInputStream ais = AudioSystem.getAudioInputStream(new ByteArrayInputStream(data));
-			Clip clip = AudioSystem.getClip();
+			DataLine.Info info = new DataLine.Info(Clip.class, ais.getFormat());
+			Clip clip = (Clip)AudioSystem.getLine(info);
 			clip.open(ais);
 			return clip;
 		} catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
