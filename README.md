@@ -1,2 +1,2 @@
-# PixelDust
-PixelDust Game Engine for the Blujm Game Jam
+# Buddy
+Game made for the Blujm Game Jam
